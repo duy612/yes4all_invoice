@@ -6,7 +6,7 @@ import plotly.express as pe
 @st.cache
 def get_usa_data():
     master_invoice = pd.read_excel(
-        r'C:\Users\duyduong\Desktop\Project LSQ All IN 1\1. MasterInvoice\master_usa.xlsx'
+        'master_usa.xlsx'
     )
     return master_invoice
 
