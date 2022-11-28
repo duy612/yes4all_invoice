@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as pe
 import xlrd
+import openpyxl
 
 #READ DATA-----------------------------------------------------------------------------------
 @st.cache
