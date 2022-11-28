@@ -13,3 +13,4 @@ dependencies:
   - mysql-connector-python == 8.0.31
   - openpyxl == 3.0.10
   - pipreqs == 0.4.11
+  - xlrd < 2.0

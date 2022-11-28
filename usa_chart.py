@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as pe
+import xlrd
 
 #READ DATA-----------------------------------------------------------------------------------
 @st.cache
