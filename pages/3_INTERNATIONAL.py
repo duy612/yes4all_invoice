@@ -167,7 +167,7 @@ csv_selected = convert_df(df_selection)
 
 col1, col2  = st.columns(2)
 col1.plotly_chart(fig_sun)
-col2.dataframe(df_selection)
+col2.dataframe(df_selection.groupby('country')['invoice_amount'].sum())
 col2.download_button(
         label="Download raw data as CSV",
         data=csv,
