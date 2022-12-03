@@ -4,25 +4,26 @@ import plotly.express as pe
 import xlrd
 import openpyxl
 
+st.set_page_config(page_title = 'Yes4All_Invoice',
+                    page_icon = ":money_with_wings:",
+                    layout = 'wide'
+                    )
+
 #READ DATA-----------------------------------------------------------------------------------
 @st.cache
-def get_usa_data():
+def get_inter_data():
     master_invoice = pd.read_excel(
-        'master_usa.xlsx'
+        'master_inter.xlsx'
     )
     return master_invoice
 
-master_invoice = get_usa_data()
+master_invoice = get_inter_data()
 
 #---------------------STREAMLIT-----------------------------------------------------------------------------------------------------------------------
 
-# st.set_page_config(page_title = 'Yes4All_Invoice',
-#                     page_icon = ":money_with_wings:",
-#                     layout = 'wide'
-#                     )
 
 #-------------SIDEBAR-------------------------------------------------------------
-st.sidebar.header('Please Filter Here:')
+st.sidebar.header('Please Filter Here :wave::')
 # db_status = st.sidebar.multiselect(
 #     "Select FCR Database Status",
 #     options = master_invoice['fcr_db_status'].unique(),
@@ -33,6 +34,12 @@ collection_status = st.sidebar.multiselect(
     "Select FCR Collection Status:",
     options = master_invoice["fcr_collection_status"].unique(),
     default = master_invoice["fcr_collection_status"].unique()
+)
+
+country_select = st.sidebar.multiselect(
+    "Select International Countries:",
+    options = master_invoice['country'].unique(),
+    default = master_invoice['country'].unique()
 )
 
 aging_select = st.sidebar.slider(
@@ -49,7 +56,7 @@ aging_select = st.sidebar.slider(
 # )
 
 df_selection = master_invoice.query(
-    "aging_round >= @aging_select[0] & aging_round <= @aging_select[1]  & fcr_collection_status == @collection_status"
+    "aging_round >= @aging_select[0] & aging_round <= @aging_select[1]  & fcr_collection_status == @collection_status & country == @country_select"
 )
 
 # df_selection = master_invoice.query(
@@ -61,7 +68,7 @@ df_selection = master_invoice.query(
 # )
 
 #-----------MAIN PAGE----------------------
-st.title(":money_with_wings: USA Available Invoice")
+st.title(":earth_americas: International Available Invoice")
 st.markdown("##")
 
 # TOP KPI's
@@ -127,11 +134,11 @@ fig_collection.update_traces(textposition = 'outside')
 
 # SUNBURST CHART--------------------
 sun_df = df_selection.groupby(
-    by = ['fcr_db_status','fcr_collection_status'], as_index = False
+    by = ['fcr_collection_status','aging_round','country'], as_index = False
 )[['invoice_number', 'invoice_amount']].aggregate({'invoice_number':'count', 'invoice_amount':'sum'})
 
 fig_sun = pe.sunburst(
-    sun_df, path = ['fcr_collection_status','fcr_db_status'],
+    sun_df, path = ['fcr_collection_status','country', 'aging_round'],
     values = 'invoice_amount',
     template = 'plotly_dark',
     title = '<b>TOTAL INVOICE BY VALUE<b>',
@@ -140,12 +147,13 @@ fig_sun = pe.sunburst(
 )
 fig_sun.update_traces(textinfo = 'label+percent entry')
 
-st.plotly_chart(fig_sun)
-st.plotly_chart(fig_collection)
+# col1, col2  = st.columns(2)
+# col1.plotly_chart(fig_sun)
+# col2.plotly_chart(fig_collection)
 
 #DATAFRAME -----------------------------------
 
-st.dataframe(df_selection)
+# st.dataframe(df_selection)
 
 #DOWNLOAD BUTTON------------------------------
 
@@ -157,22 +165,39 @@ def convert_df(df):
 csv = convert_df(master_invoice)
 csv_selected = convert_df(df_selection)
 
-
-left_column, right_column = st.columns(2)
-with left_column:
-    st.download_button(
+col1, col2  = st.columns(2)
+col1.plotly_chart(fig_sun)
+col2.dataframe(df_selection)
+col2.download_button(
         label="Download raw data as CSV",
         data=csv,
         file_name='master_invoice_usa.csv',
         mime='text/csv',
 )
-with right_column:
-    st.download_button(
+col2.download_button(
         label="Download filtered data as CSV",
         data=csv_selected,
         file_name='master_invoice_usa_filtered.csv',
         mime='text/csv',
 )
+
+st.plotly_chart(fig_collection)
+
+# left_column, right_column = st.columns(2)
+# with left_column:
+#     st.download_button(
+#         label="Download raw data as CSV",
+#         data=csv,
+#         file_name='master_invoice_usa.csv',
+#         mime='text/csv',
+# )
+# with right_column:
+#     st.download_button(
+#         label="Download filtered data as CSV",
+#         data=csv_selected,
+#         file_name='master_invoice_usa_filtered.csv',
+#         mime='text/csv',
+# )
 
 
 # # HIDE ST STYLE----------------
