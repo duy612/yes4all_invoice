@@ -166,9 +166,17 @@ csv = convert_df(master_invoice)
 csv_selected = convert_df(df_selection)
 
 col1, col2  = st.columns(2)
-col1.plotly_chart(fig_sun)
-col2.dataframe(df_selection.groupby('country')['invoice_amount'].sum())
-col2.download_button(
+col1.dataframe(df_selection.groupby(['country'])['invoice_amount'].sum().sort_values(ascending = False))
+col2.dataframe(df_selection.pivot_table(index = 'country', columns = 'aging_round', values = 'invoice_amount',aggfunc = 'sum'))
+
+st.plotly_chart(fig_sun)
+
+
+st.plotly_chart(fig_collection)
+st.dataframe(df_selection)
+
+col1, col2  = st.columns(2)
+col1.download_button(
         label="Download raw data as CSV",
         data=csv,
         file_name='master_invoice_usa.csv',
@@ -180,8 +188,6 @@ col2.download_button(
         file_name='master_invoice_usa_filtered.csv',
         mime='text/csv',
 )
-
-st.plotly_chart(fig_collection)
 
 # left_column, right_column = st.columns(2)
 # with left_column:
