@@ -9,6 +9,8 @@ st.set_page_config(page_title = 'Yes4All_Invoice',
                     layout = 'wide'
                     )
 
+now = datetime.datetime.now()
+
 #READ DATA-----------------------------------------------------------------------------------
 @st.cache
 def get_inter_data():
@@ -179,13 +181,13 @@ col1, col2  = st.columns(2)
 col1.download_button(
         label="Download raw data as CSV",
         data=csv,
-        file_name='master_invoice_usa.csv',
+        file_name='master_invoice_inter_'+f'{now:%m%d%Y}' + '.csv',
         mime='text/csv',
 )
 col2.download_button(
         label="Download filtered data as CSV",
         data=csv_selected,
-        file_name='master_invoice_usa_filtered.csv',
+        file_name='master_invoice_inter_filtered_'+f'{now:%m%d%Y}' + '.csv',
         mime='text/csv',
 )
 

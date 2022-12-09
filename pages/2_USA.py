@@ -3,11 +3,14 @@ import streamlit as st
 import plotly.express as pe
 import xlrd
 import openpyxl
+import datetime
 
 st.set_page_config(page_title = 'Yes4All_Invoice',
                     page_icon = ":money_with_wings:",
                     layout = 'wide'
                     )
+
+now = datetime.datetime.now()
 
 #READ DATA-----------------------------------------------------------------------------------
 @st.cache
@@ -169,13 +172,13 @@ col2.dataframe(df_selection.groupby(['fcr_collection_status'])['invoice_amount']
 col2.download_button(
         label="Download raw data as CSV",
         data=csv,
-        file_name='master_invoice_usa.csv',
+        file_name='master_invoice_usa_'+f'{now:%m%d%Y}' + '.csv',
         mime='text/csv',
 )
 col2.download_button(
         label="Download filtered data as CSV",
         data=csv_selected,
-        file_name='master_invoice_usa_filtered.csv',
+        file_name='master_invoice_usa_filtered_'+f'{now:%m%d%Y}' + '.csv',
         mime='text/csv',
 )
 
