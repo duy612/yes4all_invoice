@@ -42,7 +42,7 @@ collection_status = st.sidebar.multiselect(
 aging_select = st.sidebar.slider(
     "Select Aging Group",
     #value = int(master_invoice['aging_round'].max()),
-    int(master_invoice['aging_round'].min()), int(master_invoice['aging_round'].max()), value = (40,120), step = 5
+    int(master_invoice['aging_round'].min()), int(master_invoice['aging_round'].max()), value = (40,int(master_invoice['aging_round'].max())), step = 5
 )
 
 
@@ -169,7 +169,11 @@ csv_selected = convert_df(df_selection)
 col1, col2  = st.columns(2)
 col1.plotly_chart(fig_sun)
 col2.dataframe(df_selection.groupby(['fcr_collection_status'])['invoice_amount'].sum().sort_values(ascending = False))
-col2.download_button(
+
+st.plotly_chart(fig_collection)
+st.dataframe(df_selection)
+col1, col2 = st.columns(2)
+col1.download_button(
         label="Download raw data as CSV",
         data=csv,
         file_name='master_invoice_usa_'+f'{now:%m%d%Y}' + '.csv',
@@ -181,9 +185,6 @@ col2.download_button(
         file_name='master_invoice_usa_filtered_'+f'{now:%m%d%Y}' + '.csv',
         mime='text/csv',
 )
-
-st.plotly_chart(fig_collection)
-st.dataframe(df_selection)
 
 # left_column, right_column = st.columns(2)
 # with left_column:

@@ -48,7 +48,7 @@ country_select = st.sidebar.multiselect(
 aging_select = st.sidebar.slider(
     "Select Aging Group",
     #value = int(master_invoice['aging_round'].max()),
-    int(master_invoice['aging_round'].min()), int(master_invoice['aging_round'].max()), value = (40,120), step = 5
+    int(master_invoice['aging_round'].min()), int(master_invoice['aging_round'].max()), value = (40,int(master_invoice['aging_round'].max())), step = 5
 )
 
 
