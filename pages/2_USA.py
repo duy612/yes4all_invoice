@@ -57,6 +57,10 @@ df_selection = master_invoice.query(
 )
 
 # df_selection = master_invoice.query(
+#     "aging_round >= @aging_select[0] & aging_round <= @aging_select[1]  & fcr_collection_status == @collection_status"
+# )
+
+# df_selection = master_invoice.query(
 #     "fcr_collection_status == @collection_status"
 # )
 

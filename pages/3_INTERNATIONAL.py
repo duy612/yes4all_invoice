@@ -15,12 +15,12 @@ now = datetime.datetime.now()
 #READ DATA-----------------------------------------------------------------------------------
 @st.cache
 def get_inter_data():
-    master_invoice = pd.read_excel(
+    master_invoice_int = pd.read_excel(
         'master_inter.xlsx'
     )
-    return master_invoice
+    return master_invoice_int
 
-master_invoice = get_inter_data()
+master_invoice_int = get_inter_data()
 
 #---------------------STREAMLIT-----------------------------------------------------------------------------------------------------------------------
 
@@ -33,22 +33,22 @@ st.sidebar.header('Please Filter Here :wave::')
 #     default = master_invoice['fcr_db_status'].unique()
 # )
 
-collection_status = st.sidebar.multiselect(
+collection_status_int = st.sidebar.multiselect(
     "Select FCR Collection Status:",
-    options = master_invoice["fcr_collection_status"].unique(),
-    default = master_invoice["fcr_collection_status"].unique()
+    options = master_invoice_int["fcr_collection_status"].unique(),
+    default = master_invoice_int["fcr_collection_status"].unique()
 )
 
-country_select = st.sidebar.multiselect(
+country_select_int = st.sidebar.multiselect(
     "Select International Countries:",
-    options = master_invoice['country'].unique(),
-    default = master_invoice['country'].unique()
+    options = master_invoice_int['country'].unique(),
+    default = master_invoice_int['country'].unique()
 )
 
-aging_select = st.sidebar.slider(
+aging_select_int = st.sidebar.slider(
     "Select Aging Group",
     #value = int(master_invoice['aging_round'].max()),
-    int(master_invoice['aging_round'].min()), int(master_invoice['aging_round'].max()), value = (40,int(master_invoice['aging_round'].max())), step = 5
+    int(master_invoice_int['aging_round'].min()), int(master_invoice_int['aging_round'].max()), value = (40,int(master_invoice_int['aging_round'].max())), step = 5
 )
 
 
@@ -58,8 +58,8 @@ aging_select = st.sidebar.slider(
 #     default = master_invoice['aging_round'].unique()
 # )
 
-df_selection = master_invoice.query(
-    "aging_round >= @aging_select[0] & aging_round <= @aging_select[1]  & fcr_collection_status == @collection_status & country == @country_select"
+df_selection_int = master_invoice_int.query(
+    "aging_round >= @aging_select_int[0] & aging_round <= @aging_select_int[1]  & fcr_collection_status == @collection_status_int & country == @country_select_int"
 )
 
 # df_selection = master_invoice.query(
@@ -75,10 +75,10 @@ st.title(":earth_americas: International Available Invoice")
 st.markdown("##")
 
 # TOP KPI's
-total_invoice = int(df_selection['invoice_number'].count())
-total_amount = round(df_selection['invoice_amount'].sum(),2)
-invoice_collected = int(df_selection.loc[df_selection['fcr_collection_status'] == 'Collected']['invoice_number'].count())
-amount_collected = round(df_selection.loc[df_selection['fcr_collection_status'] == 'Collected']['invoice_amount'].sum(),2)
+total_invoice = int(df_selection_int['invoice_number'].count())
+total_amount = round(df_selection_int['invoice_amount'].sum(),2)
+invoice_collected = int(df_selection_int.loc[df_selection_int['fcr_collection_status'] == 'Collected']['invoice_number'].count())
+amount_collected = round(df_selection_int.loc[df_selection_int['fcr_collection_status'] == 'Collected']['invoice_amount'].sum(),2)
 
 left_column, right_column = st.columns(2)
 with left_column:
@@ -98,7 +98,7 @@ with right_column:
 st.markdown("---")
 
 # INVOICE BY AGING GROUP--------------------------------------------------------------------------
-aging_by_collection = df_selection.groupby(
+aging_by_collection = df_selection_int.groupby(
     by = ['aging_round','fcr_collection_status'], as_index= False
     )[['invoice_number','invoice_amount']].aggregate(
         {'invoice_amount' : 'sum', 'invoice_number' : 'count'}
@@ -136,7 +136,7 @@ fig_collection.update_layout(
 fig_collection.update_traces(textposition = 'outside')
 
 # SUNBURST CHART--------------------
-sun_df = df_selection.groupby(
+sun_df = df_selection_int.groupby(
     by = ['fcr_collection_status','aging_round','country'], as_index = False
 )[['invoice_number', 'invoice_amount']].aggregate({'invoice_number':'count', 'invoice_amount':'sum'})
 
@@ -165,18 +165,18 @@ def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv(index = False).encode('utf-8')
 
-csv = convert_df(master_invoice)
-csv_selected = convert_df(df_selection)
+csv = convert_df(master_invoice_int)
+csv_selected = convert_df(df_selection_int)
 
 col1, col2  = st.columns(2)
-col1.dataframe(df_selection.groupby(['country'])['invoice_amount'].sum().sort_values(ascending = False))
-col2.dataframe(df_selection.pivot_table(index = 'country', columns = 'aging_round', values = 'invoice_amount',aggfunc = 'sum'))
+col1.dataframe(df_selection_int.groupby(['country'])['invoice_amount'].sum().sort_values(ascending = False))
+col2.dataframe(df_selection_int.pivot_table(index = 'country', columns = 'aging_round', values = 'invoice_amount',aggfunc = 'sum'))
 
 st.plotly_chart(fig_sun)
 
 
 st.plotly_chart(fig_collection)
-st.dataframe(df_selection)
+st.dataframe(df_selection_int)
 
 col1, col2  = st.columns(2)
 col1.download_button(
